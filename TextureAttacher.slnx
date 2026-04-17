@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/Library/" />
+  <Folder Name="/Library/Core/">
+    <Project Path="TextureAttachLib/Core/TextureAttacher.Library.Core.csproj" />
+  </Folder>
+  <Folder Name="/Library/Image/" />
+  <Folder Name="/Library/Image/ImageMagic/">
+    <Project Path="TextureAttachLib/Image/ImageMagic/TextureAttacher.Library.Image.ImageMagic/TextureAttacher.Library.Image.ImageMagic.csproj" />
+  </Folder>
+  <Folder Name="/Library/Image/OpenCV/">
+    <Project Path="TextureAttachLib/Image/OpenCV/TextureAttacher.Library.Image.OpenCV.csproj" />
+  </Folder>
+  <Folder Name="/Library/WindoesForm/">
+    <Project Path="TextureAttachLib/WindowsForm/TextureAttacher.Library.WindoesForm/TextureAttacher.Library.WindoesForm.csproj" />
+  </Folder>
+  <Project Path="TextureAllocator/TextureAllocator.csproj" Id="8a6288fa-c911-4afd-943b-0e3d8aced833" />
+  <Project Path="TextureProjectCreator/TextureProjectCreator.csproj" />
+</Solution>
