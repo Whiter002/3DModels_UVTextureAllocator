@@ -19,12 +19,18 @@ jobs:
   Build-and-Publish:
     runs-on: windows-latest
     steps:
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props', '**/*.targets', '**/NuGet.Config', '**/global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
       - uses: actions/checkout@v5
       - name: Set up dotnet 10.x
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '10.x'
-          cache: true
       - name: Restore
         run: dotnet restore
       - name: Build
@@ -32,6 +38,7 @@ jobs:
       - name: Archive Release Outputs
         shell: pwsh
         run: |
+          New-Item -ItemType Directory -Force -Path build | Out-Null
           Compress-Archive -Path TextureAllocator\bin\Release\net10.0-windows -DestinationPath build/release.zip -Force
       - name: Upload Release Artifact
         uses: actions/upload-artifact@v4
