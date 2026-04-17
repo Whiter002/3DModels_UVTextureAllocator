@@ -1,0 +1,2 @@
+# 3DModels_UVTextureAllocator
+同じテクスチャを複数個所に割り当てる作業を効率化するツールです。
