@@ -52,7 +52,6 @@ jobs:
             overwrite: true
             body: "This is my release text"
       - name: Upload GitHub Release Asset
-        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           name: Test
