@@ -85,7 +85,7 @@ jobs:
           $versionInfo = & .\.tools\nbgv get-version -f json | ConvertFrom-Json
           $sha256 = (Get-FileHash -Path build\release.zip -Algorithm SHA256).Hash.ToLowerInvariant()
           $latestVersion = [ordered]@{
-            latestVersion = $versionInfo.NuGetPackageVersion
+            latestVersion = $versionInfo.AssemblyInformationalVersion
             hash = $sha256
           }
           $latestVersion | ConvertTo-Json | Set-Content -Path build\LatestVersion.json -Encoding utf8
