@@ -6,6 +6,12 @@
     "^refs/heads/release$",
     "^refs/heads/releases/.+"
   ],
+  "pathFilters": [
+    "TextureAllocator/",
+    "TextureAttachLib/",
+    "TextureProjectCreator/",
+    ":!version.json"
+  ],
   "cloudBuild": {
     "buildNumber": {
       "enabled": true
