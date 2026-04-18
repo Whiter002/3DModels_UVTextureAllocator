@@ -1,0 +1,99 @@
+name: Publish Latest Version Metadata
+run-name: Publish LatestVersion.json for ${{ github.repository }}
+on:
+  push:
+    paths:
+      - '.github/workflows/triggers/action_test_trigger'
+
+permissions:
+  contents: write
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: windows-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Check out repository code
+        uses: actions/checkout@v5
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+  Build-and-Publish:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      
+      - uses: actions/checkout@v5
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props', '**/*.targets', '**/NuGet.Config', '**/global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Set up dotnet 10.x
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '10.x'
+
+      - name: Install nbgv
+        shell: pwsh
+        run: |
+          dotnet tool install --tool-path .\.tools nbgv
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Archive Release Outputs
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path build | Out-Null
+          Compress-Archive -Path TextureAllocator\bin\Release\net10.0-windows -DestinationPath build/release.zip -Force
+
+      - name: Upload Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+            repo_token: ${{ secrets.GITHUB_TOKEN }}
+            path: build/release.zip
+            asset_name: release.zip
+            tag: ${{ github.ref }}
+            overwrite: true
+            body: "This is my release text"
+
+      - name: Upload GitHub Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Test
+          tag_name: Test-release
+          files: build/release.zip
+          generate_release_notes: true
+
+      - name: Generate LatestVersion.json
+        shell: pwsh
+        run: |
+          $versionInfo = & .\.tools\nbgv get-version -f json | ConvertFrom-Json
+          $sha256 = (Get-FileHash -Path build\release.zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          $latestVersion = [ordered]@{
+            latestVersion = $versionInfo.NuGetPackageVersion
+            hash = $sha256
+          }
+          $latestVersion | ConvertTo-Json | Set-Content -Path build\LatestVersion.json -Encoding utf8
+
+      - name: Upload LatestVersion.json to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Test
+          tag_name: Test-release
+          files: build/LatestVersion.json
+          generate_release_notes: true
