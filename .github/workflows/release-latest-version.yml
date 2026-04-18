@@ -6,6 +6,7 @@ on:
       - 'feature/**'
     paths:
       - '.github/workflows/triggers/action_test_trigger'
+      - '.github/workflows/release-latest-version.yml'
 
 permissions:
   contents: write
