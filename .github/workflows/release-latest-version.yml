@@ -2,6 +2,8 @@ name: Publish Latest Version Metadata
 run-name: Publish LatestVersion.json for ${{ github.repository }}
 on:
   push:
+    branches:
+      - 'features/**'
     paths:
       - '.github/workflows/triggers/action_test_trigger'
 
