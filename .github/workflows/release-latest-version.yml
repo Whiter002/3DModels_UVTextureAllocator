@@ -61,6 +61,14 @@ jobs:
           New-Item -ItemType Directory -Force -Path build | Out-Null
           Compress-Archive -Path TextureAllocator\bin\Release\net10.0-windows -DestinationPath build/release.zip -Force
 
+      - name: Read version metadata
+        id: version
+        shell: pwsh
+        run: |
+          $versionInfo = & .\.tools\nbgv get-version -f json | ConvertFrom-Json
+          "ASSEMBLY_INFORMATIONAL_VERSION=$($versionInfo.AssemblyInformationalVersion)" >> $env:GITHUB_ENV
+          "assembly_informational_version=$($versionInfo.AssemblyInformationalVersion)" >> $env:GITHUB_OUTPUT
+
       - name: Upload Workflow Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -74,7 +82,7 @@ jobs:
       - name: Upload GitHub Release Asset
         uses: softprops/action-gh-release@v2
         with:
-          name: Test
+          name: ${{ steps.version.outputs.assembly_informational_version }}
           tag_name: Test-release
           files: build/release.zip
           generate_release_notes: true
@@ -82,10 +90,9 @@ jobs:
       - name: Generate LatestVersion.json
         shell: pwsh
         run: |
-          $versionInfo = & .\.tools\nbgv get-version -f json | ConvertFrom-Json
           $sha256 = (Get-FileHash -Path build\release.zip -Algorithm SHA256).Hash.ToLowerInvariant()
           $latestVersion = [ordered]@{
-            latestVersion = $versionInfo.AssemblyInformationalVersion
+            latestVersion = $env:ASSEMBLY_INFORMATIONAL_VERSION
             hash = $sha256
           }
           $latestVersion | ConvertTo-Json | Set-Content -Path build\LatestVersion.json -Encoding utf8
@@ -93,7 +100,7 @@ jobs:
       - name: Upload LatestVersion.json to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: Test
+          name: ${{ steps.version.outputs.assembly_informational_version }}
           tag_name: Test-release
           files: build/LatestVersion.json
           generate_release_notes: true
