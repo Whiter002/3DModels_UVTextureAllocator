@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NuGet.Versioning" Version="7.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TextureAttachLib\Core\TextureAttacher.Library.Core.csproj" />
     <ProjectReference Include="..\TextureAttachLib\Image\ImageMagic\TextureAttacher.Library.Image.ImageMagic\TextureAttacher.Library.Image.ImageMagic.csproj" />
     <ProjectReference Include="..\TextureAttachLib\Image\OpenCV\TextureAttacher.Library.Image.OpenCV.csproj" />
@@ -16,8 +20,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="profiles\HowlHeart.profile">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
 
