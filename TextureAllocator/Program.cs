@@ -19,7 +19,7 @@ internal static class Program
             var result = UpdateChecker.AutoCheckForUpdate().Result;
             if(result.IsAvailable && !String.IsNullOrEmpty(result.DownloadUrl))
             {
-                MessageBox.Show("アップデートがあります。");
+                MessageBox.Show("アップデートがあります。","お知らせ", MessageBoxButtons.OK);
             }
         }
 
