@@ -10,11 +10,11 @@ internal static class UpdateChecker
     {
         var currentTime = DateTime.Now;
         var lastCheckDate = Settings.Default.LastUpdateCheckDate;
-        if (currentTime - lastCheckDate < TimeSpan.FromHours(6))
+        var result = new UpdateCheckResult(false, "");
         {
-            var result = await CheckForUpdates();
+            result = await CheckForUpdates();
         }
-        return new(false, "");
+        return result;
     }
 
 
