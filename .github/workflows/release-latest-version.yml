@@ -84,7 +84,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ steps.version.outputs.assembly_informational_version }}
-          tag_name: Test-release
+          tag_name: ${{ steps.version.outputs.assembly_informational_version }}
           files: build/release.zip
           generate_release_notes: true
 
@@ -102,6 +102,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ steps.version.outputs.assembly_informational_version }}
-          tag_name: Test-release
+          tag_name: ${{ steps.version.outputs.assembly_informational_version }}
           files: build/LatestVersion.json
           generate_release_notes: true
