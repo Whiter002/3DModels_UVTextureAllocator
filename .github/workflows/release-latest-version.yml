@@ -3,7 +3,7 @@ run-name: Publish LatestVersion.json for ${{ github.repository }}
 on:
   push:
     branches:
-      - 'features/**'
+      - 'feature/**'
     paths:
       - '.github/workflows/triggers/action_test_trigger'
 
