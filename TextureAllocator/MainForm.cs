@@ -47,8 +47,8 @@ public partial class MainForm : Form
     public MainForm(bool checkUpdate) : this()
     {
 
-        if (checkUpdate) CheckUpdate(true);
         foreach (var dic in Directory.GetDirectories(Settings.Default.UpdateFilePath)) Directory.Delete(dic, true);
+        if (checkUpdate) CheckUpdate(true);
 
     }
 
@@ -414,7 +414,7 @@ public partial class MainForm : Form
             ZipFile.ExtractToDirectory(save, extractPath, true);
             var pid = Process.GetCurrentProcess().Id;
             //TODO:適切なタイミングで解凍ファイルの削除やダウンロードの処理を
-            var exePath = Path.Combine(Settings.Default.UpdateFilePath, "net10.0-windows");
+            var exePath = extractPath;
             var updateExePath = Application.ExecutablePath;
             var robocopyOptions = new string[]
             {

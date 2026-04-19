@@ -50,9 +50,13 @@ public partial class DownLoadProgressForm : Form
                 this.downloadProgress.Tag = item.totalContents;
                 this.downloadProgress.Value = 0;
             });
-        CompleteProgress = new Progress<int>(totalContents => Close());
+        CompleteProgress = new Progress<int>(totalContents =>
+        {
+            this.DialogResult = DialogResult.OK;
+            Close();
+        });
     }
-
+     
     public DownLoadProgressForm(DownloadInfo[] downloadContents) : this()
     {
         this.downloadContents = downloadContents;
