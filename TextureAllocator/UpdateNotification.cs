@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Security.Policy;
 using System.Text;
 using System.Windows.Forms;
 
@@ -15,6 +16,7 @@ public partial class UpdateNotification : Form
     public UpdateNotification()
     {
         InitializeComponent();
+        this.ToReleaseNotes.Links.Add(new LinkLabel.Link() { LinkData = "https://github.com/Whiter002/3DModels_UVTextureAllocator/releases" });
     }
     public DialogResult ShowDialog(string releaseNotesMd)
     {
@@ -25,6 +27,10 @@ public partial class UpdateNotification : Form
 
         string plainText = writer.ToString();
         plainText = plainText.Replace("\n", Environment.NewLine);
+        for(int i = 0; i < 5; i++)
+        {
+            plainText += plainText.EndsWith(Environment.NewLine) ? plainText : plainText+Environment.NewLine;
+        }
         this.textBox1.Text = plainText;
         return this.ShowDialog();
     }
@@ -41,5 +47,27 @@ public partial class UpdateNotification : Form
     {
         this.SkipButton.Tag = DialogResult.Cancel;
         this.UpdateButton.Tag = DialogResult.OK;
+    }
+
+    private void ToReleaseNotes_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        if (e.Link?.LinkData is not string urlstr) return;
+        if(!Uri.TryCreate(urlstr,UriKind.Absolute,out Uri? url))
+        {
+            MessageBox.Show("不正なリンクが設定されています。開発者に問い合わせてください。", "エラー", MessageBoxButtons.OK);
+            return;
+        }
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = urlstr,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("リンクを開くことができませんでした。エラー: " + ex.Message, "エラー", MessageBoxButtons.OK);
+        }
     }
 }
