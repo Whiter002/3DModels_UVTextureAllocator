@@ -7,18 +7,6 @@ partial class DownLoadProgressForm
     /// </summary>
     private System.ComponentModel.IContainer components = null;
 
-    /// <summary>
-    /// Clean up any resources being used.
-    /// </summary>
-    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing && (components != null))
-        {
-            components.Dispose();
-        }
-        base.Dispose(disposing);
-    }
 
     #region Windows Form Designer generated code
 
@@ -29,7 +17,7 @@ partial class DownLoadProgressForm
     private void InitializeComponent()
     {
         tableLayoutPanel1 = new TableLayoutPanel();
-        progressBar1 = new ProgressBar();
+        downloadProgress = new ProgressBar();
         ProgressLabel = new Label();
         panel1 = new Panel();
         cancelButton = new Button();
@@ -41,33 +29,35 @@ partial class DownLoadProgressForm
         // 
         tableLayoutPanel1.ColumnCount = 1;
         tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-        tableLayoutPanel1.Controls.Add(progressBar1, 0, 1);
+        tableLayoutPanel1.Controls.Add(downloadProgress, 0, 1);
         tableLayoutPanel1.Controls.Add(ProgressLabel, 0, 0);
         tableLayoutPanel1.Controls.Add(panel1, 0, 2);
         tableLayoutPanel1.Dock = DockStyle.Fill;
         tableLayoutPanel1.Location = new Point(0, 0);
         tableLayoutPanel1.Name = "tableLayoutPanel1";
         tableLayoutPanel1.RowCount = 3;
-        tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 22F));
         tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+        tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 27F));
         tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 31F));
         tableLayoutPanel1.Size = new Size(302, 81);
         tableLayoutPanel1.TabIndex = 0;
         // 
-        // progressBar1
+        // downloadProgress
         // 
-        progressBar1.Dock = DockStyle.Fill;
-        progressBar1.Location = new Point(3, 25);
-        progressBar1.Name = "progressBar1";
-        progressBar1.Size = new Size(296, 22);
-        progressBar1.TabIndex = 1;
+        downloadProgress.Dock = DockStyle.Fill;
+        downloadProgress.Location = new Point(3, 26);
+        downloadProgress.MarqueeAnimationSpeed = 1000;
+        downloadProgress.Maximum = 1000;
+        downloadProgress.Name = "downloadProgress";
+        downloadProgress.Size = new Size(296, 21);
+        downloadProgress.TabIndex = 1;
         // 
         // ProgressLabel
         // 
         ProgressLabel.Dock = DockStyle.Fill;
         ProgressLabel.Location = new Point(3, 0);
         ProgressLabel.Name = "ProgressLabel";
-        ProgressLabel.Size = new Size(296, 22);
+        ProgressLabel.Size = new Size(296, 23);
         ProgressLabel.TabIndex = 2;
         ProgressLabel.Text = "label1";
         ProgressLabel.TextAlign = ContentAlignment.BottomLeft;
@@ -90,15 +80,20 @@ partial class DownLoadProgressForm
         cancelButton.TabIndex = 0;
         cancelButton.Text = "Cancel";
         cancelButton.UseVisualStyleBackColor = true;
+        cancelButton.Click += cancelButton_Click;
         // 
         // DownLoadProgressForm
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
+        CancelButton = cancelButton;
         ClientSize = new Size(302, 81);
         Controls.Add(tableLayoutPanel1);
+        FormBorderStyle = FormBorderStyle.FixedToolWindow;
+        MinimumSize = new Size(318, 120);
         Name = "DownLoadProgressForm";
         Text = "DownLoadProgressForm";
+        FormClosing += DownLoadProgressForm_FormClosing;
         tableLayoutPanel1.ResumeLayout(false);
         panel1.ResumeLayout(false);
         ResumeLayout(false);
@@ -107,7 +102,7 @@ partial class DownLoadProgressForm
     #endregion
 
     private TableLayoutPanel tableLayoutPanel1;
-    private ProgressBar progressBar1;
+    private ProgressBar downloadProgress;
     private Label ProgressLabel;
     private Panel panel1;
     private Button cancelButton;
