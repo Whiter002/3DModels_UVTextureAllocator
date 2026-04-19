@@ -3,6 +3,7 @@ using OpenCvSharp.ImgHash;
 using System.Drawing.Imaging;
 using System.Text.Json;
 using System.Transactions;
+using TextureAllocator.Core;
 using TextureAllocator.Enums;
 using TextureAllocator.Events;
 using TextureAttacher.Library.Core.Enums;
@@ -13,7 +14,7 @@ using TextureAttacher.Library.WindoesForm.Function;
 
 namespace TextureAllocator;
 
-public partial class Form1 : Form
+public partial class MainForm : Form
 {
     event TransitionedMainStatusDelegate TransitionedMainStatusEvent;
     ColorPalette palette = new ColorPalette(Color.LightBlue, Color.LightPink, Color.LightGreen);
@@ -22,9 +23,23 @@ public partial class Form1 : Form
     string output = "";
 
     private TargetTextureKind _allocateTargetTextureKind = TargetTextureKind.None;
-    public Form1()
+    public MainForm()
     {
         InitializeComponent();
+    }
+    public MainForm(bool checkUpdate):this()
+    {
+
+        if (checkUpdate)
+        {//Run Update Check
+
+            var result = UpdateChecker.AutoCheckForUpdate().Result;
+            if (result.IsAvailable && !String.IsNullOrEmpty(result.DownloadUrl))
+            {
+                UpdateNotification notifForm = new UpdateNotification();
+                notifForm.ShowDialog(result.ReleaseNotesMarkDown);
+            }
+        }
     }
     EyeRectangleData Profile;
     MainOperatePhase? _currentPhase = null;

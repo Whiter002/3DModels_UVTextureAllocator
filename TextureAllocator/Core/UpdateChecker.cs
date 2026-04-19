@@ -10,9 +10,10 @@ internal static class UpdateChecker
     {
         var currentTime = DateTime.Now;
         var lastCheckDate = Settings.Default.LastUpdateCheckDate;
-        var result = new UpdateCheckResult(false, "");
+        var result = new UpdateCheckResult(false, "","");
+        if (currentTime - lastCheckDate > TimeSpan.FromHours(0))
         {
-            result = await CheckForUpdates();
+            result = await CheckForUpdates().ConfigureAwait(false);
         }
         return result;
     }
@@ -25,16 +26,18 @@ internal static class UpdateChecker
         string apiUrl = "https://api.github.com/repos/Whiter002/3DModels_UVTextureAllocator/releases/latest";
 
         using HttpClient client = new();
+        client.Timeout = TimeSpan.FromSeconds(5);
         client.DefaultRequestHeaders.Add("User-Agent", "Chrome");
 
         // リリース情報のJSONを取得
-        string releaseJson = await client.GetStringAsync(apiUrl);
+        string releaseJson = await client.GetStringAsync(apiUrl).ConfigureAwait(false);
 
         // assets 配列から LatestVersion.json のダウンロードURLを探す
         using var doc = System.Text.Json.JsonDocument.Parse(releaseJson);
         var assets = doc.RootElement.GetProperty("assets");
 
         bool? updateAvailable = null ;
+        string releaseNotes = doc.RootElement.GetProperty("body").GetString();
         string zipDownloadUrl = null;
         NuGetVersion.TryParse(VersionInfo.CurrentVersion, out var currentVersion);
 
@@ -50,7 +53,7 @@ internal static class UpdateChecker
             if (assetName == "LatestVersion.json")
             {
                 string downloadUrl = asset.GetProperty("browser_download_url").GetString()!;
-                string versionJson = await client.GetStringAsync(downloadUrl);
+                string versionJson = await client.GetStringAsync(downloadUrl).ConfigureAwait(false);
                 var versionData = JsonSerializer.Deserialize<LatestVersionData>(versionJson);
                 NuGetVersion.TryParse(versionData.LatestVersion, out var latestVersion);
                 if (latestVersion > currentVersion)updateAvailable = true;
@@ -60,7 +63,8 @@ internal static class UpdateChecker
         }
 
         Settings.Default.LastUpdateCheckDate = DateTime.Now;
-        return new(updateAvailable??false, zipDownloadUrl ?? "");
+        Settings.Default.Save();
+        return new(updateAvailable??false, zipDownloadUrl ?? "",releaseNotes ?? "");
     }
 
 }
