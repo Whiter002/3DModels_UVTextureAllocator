@@ -5,5 +5,8 @@
     <Setting Name="LastUpdateCheckDate" Type="System.DateTime" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="TempPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">%ALLUSERSPROFILE%\$(AssemblyName)\Temp</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

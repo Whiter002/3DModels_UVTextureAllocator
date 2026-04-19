@@ -1,10 +1,16 @@
+using OpenCvSharp.Aruco;
 using OpenCvSharp.ImgHash;
+using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.IO.Compression;
+using System.Reflection;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Transactions;
 using TextureAllocator.Core;
 using TextureAllocator.Enums;
 using TextureAllocator.Events;
+using TextureAllocator.Properties;
 using TextureAttacher.Library.Core.Enums;
 using TextureAttacher.Library.Core.Functions;
 using TextureAttacher.Library.Core.Model;
@@ -26,6 +32,11 @@ public partial class MainForm : Form
     public MainForm()
     {
         InitializeComponent();
+
+        var path = Environment.ExpandEnvironmentVariables(Settings.Default.TempPath).Replace("$(AssemblyName)", Assembly.GetExecutingAssembly().GetName().Name);
+        if (!Path.Exists(path)) Directory.CreateDirectory(path);
+        Settings.Default.TempPath = path;
+        Settings.Default.Save();
     }
     public MainForm(bool checkUpdate) : this()
     {
@@ -363,10 +374,30 @@ public partial class MainForm : Form
             UpdateNotification notifForm = new UpdateNotification();
             DialogResult dr = notifForm.ShowDialog(result.ReleaseNotesMarkDown);
             if(dr != DialogResult.OK) return;
-
-
-
-            //TODOここに更新処理
+            var save = Path.Combine(Settings.Default.TempPath, $"{Guid.NewGuid()}.zip");
+            if (!Path.Exists(Path.GetDirectoryName(save)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(save));
+            }
+            DownLoadProgressForm.DownloadInfo downloadInfo = new DownLoadProgressForm.DownloadInfo()
+            {
+                Url = result.DownloadUrl,
+                fileNameCaption = "release.zip",
+                saveTo = save
+            };
+            DownLoadProgressForm progressForm = new DownLoadProgressForm([downloadInfo]);
+            DialogResult progressResult = progressForm.ShowDialog();
+            if(progressResult != DialogResult.OK) return;
+            ZipFile.ExtractToDirectory(save, Settings.Default.TempPath);
+            var pid = Process.GetCurrentProcess().Id;
+            var exePath = Path.Combine(Settings.Default.TempPath, "release","net10.0-windows","Update.exe");
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "powershell.exe",
+                Arguments = $"-NoProfile -Command \"Wait-Process -Id {pid} -ErrorAction SilentlyContinue; Start-Process '{exePath}' -ArgumentList 'true'\"",
+                UseShellExecute = true,
+                CreateNoWindow = true
+            });
             Application.Exit();
         }else if(!is_auto) MessageBox.Show("現在、利用可能なアップデートはありません。", "お知らせ", MessageBoxButtons.OK);
     }

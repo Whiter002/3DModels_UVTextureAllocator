@@ -33,5 +33,17 @@ namespace TextureAllocator.Properties {
                 this["LastUpdateCheckDate"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("%ALLUSERSPROFILE%\\$(AssemblyName)\\Temp")]
+        public string TempPath {
+            get {
+                return ((string)(this["TempPath"]));
+            }
+            set {
+                this["TempPath"] = value;
+            }
+        }
     }
 }
