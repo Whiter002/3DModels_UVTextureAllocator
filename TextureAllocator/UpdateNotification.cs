@@ -14,18 +14,13 @@ public partial class UpdateNotification : Form
     }
     public DialogResult ShowDialog(string releaseNotesMd)
     {
-        var writer = new StringWriter();
+        using var writer = new StringWriter();
         var renderer = new HtmlRenderer(writer) { EnableHtmlForBlock = false, EnableHtmlForInline = false };
         var pipeline = new MarkdownPipelineBuilder().Build();
         Markdig.Markdown.Convert(releaseNotesMd, renderer, pipeline);
 
         string plainText = writer.ToString();
         plainText = plainText.Replace("\n", Environment.NewLine);
-        // FIXME: plainText を自分自身に連結しているためテキストが指数的に増大する。末尾改行の追加だけが目的なら修正すること。
-        for(int i = 0; i < 5; i++)
-        {
-            plainText += plainText.EndsWith(Environment.NewLine) ? plainText : plainText+Environment.NewLine;
-        }
         this.textBox1.Text = plainText;
         return this.ShowDialog();
     }
