@@ -57,5 +57,17 @@ namespace TextureAllocator.Properties {
                 this["UpdateFilePath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string CurrentHash {
+            get {
+                return ((string)(this["CurrentHash"]));
+            }
+            set {
+                this["CurrentHash"] = value;
+            }
+        }
     }
 }

@@ -11,5 +11,8 @@
     <Setting Name="UpdateFilePath" Type="System.String" Scope="User">
       <Value Profile="(Default)">%ALLUSERSPROFILE%\$(AssemblyName)\Temp\updates</Value>
     </Setting>
+    <Setting Name="CurrentHash" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
