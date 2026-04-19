@@ -29,42 +29,46 @@ internal static class UpdateChecker
         client.Timeout = TimeSpan.FromSeconds(5);
         client.DefaultRequestHeaders.Add("User-Agent", "Chrome");
 
+        UpdateCheckResult result = new(false, "","");
+
         // リリース情報のJSONを取得
-        string releaseJson = await client.GetStringAsync(apiUrl).ConfigureAwait(false);
+        string releaseJson = "";
+        var responseMessge = await client.GetAsync(apiUrl).ConfigureAwait(false);
+        if (responseMessge.IsSuccessStatusCode)
+        {
+            releaseJson = await responseMessge.Content.ReadAsStringAsync().ConfigureAwait(false);
+        }
+        var utf8Reader = new Utf8JsonReader(System.Text.Encoding.UTF8.GetBytes(releaseJson));
 
         // assets 配列から LatestVersion.json のダウンロードURLを探す
-        using var doc = System.Text.Json.JsonDocument.Parse(releaseJson);
-        var assets = doc.RootElement.GetProperty("assets");
+        if (!JsonDocument.TryParseValue(ref utf8Reader, out var doc)) return result;
 
         bool? updateAvailable = null ;
-        string releaseNotes = doc.RootElement.GetProperty("body").GetString();
-        string zipDownloadUrl = null;
-        NuGetVersion.TryParse(VersionInfo.CurrentVersion, out var currentVersion);
+        {//Compare Versions
+            NuGetVersion.TryParse(VersionInfo.CurrentVersion, out var currentVersion);
+            string latestVersionStr = doc.RootElement.GetProperty("tag_name").GetString() ?? "";
+            NuGetVersion.TryParse(latestVersionStr, out var latestVersion);
+            if (latestVersion > currentVersion) updateAvailable = true;
+        }
 
-        foreach (var asset in assets.EnumerateArray())
-        {
-            string assetName = asset.GetProperty("name").GetString();
-            if(assetName == "release.zip")
+        if (!doc.RootElement.TryGetProperty("body", out var releaseNoteElement)) return result;
+        var releaseNotes = releaseNoteElement.GetString();
+        
+        string zipDownloadUrl = null;
+        if (updateAvailable ?? false) {
+            if (!doc.RootElement.TryGetProperty("assets", out var assets)) return result;
+            foreach (var asset in assets.EnumerateArray())
             {
                 zipDownloadUrl = asset.GetProperty("browser_download_url").GetString()!;
                 if (updateAvailable is null) continue;
-                break;
-            }
-            if (assetName == "LatestVersion.json")
-            {
-                string downloadUrl = asset.GetProperty("browser_download_url").GetString()!;
-                string versionJson = await client.GetStringAsync(downloadUrl).ConfigureAwait(false);
-                var versionData = JsonSerializer.Deserialize<LatestVersionData>(versionJson);
-                NuGetVersion.TryParse(versionData.LatestVersion, out var latestVersion);
-                if (latestVersion > currentVersion)updateAvailable = true;
-                if (zipDownloadUrl is null) continue;
                 break;
             }
         }
 
         Settings.Default.LastUpdateCheckDate = DateTime.Now;
         Settings.Default.Save();
-        return new(updateAvailable??false, zipDownloadUrl ?? "",releaseNotes ?? "");
+        result = new(updateAvailable?? false, zipDownloadUrl ?? "",releaseNotes ?? "");
+        return result;
     }
 
 }
