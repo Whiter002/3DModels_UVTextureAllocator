@@ -57,7 +57,6 @@ internal static class UpdateChecker
 
         if (!doc.RootElement.TryGetProperty("body", out var releaseNoteElement)) return result;
         var releaseNotes = releaseNoteElement.GetString();
-        doc.Dispose();
         string zipDownloadUrl = null;
         if (updateAvailable ?? false) {
             if (!doc.RootElement.TryGetProperty("assets", out var assets)) return result;
@@ -68,6 +67,7 @@ internal static class UpdateChecker
                 break;
             }
         }
+        doc.Dispose();
 
         Settings.Default.LastUpdateCheckDate = DateTime.Now;
         Settings.Default.Save();

@@ -48,6 +48,7 @@ public partial class MainForm : Form
     {
 
         if (checkUpdate) CheckUpdate(true);
+        foreach (var dic in Directory.GetDirectories(Settings.Default.UpdateFilePath)) Directory.Delete(dic, true);
 
     }
 
@@ -408,11 +409,12 @@ public partial class MainForm : Form
                 DialogResult progressResult = progressForm.ShowDialog();
                 if (progressResult != DialogResult.OK) return;
             }
-            ZipFile.ExtractToDirectory(save, Settings.Default.UpdateFilePath);
+
+            ZipFile.ExtractToDirectory(save, Settings.Default.UpdateFilePath,true);
             var pid = Process.GetCurrentProcess().Id;
-            //TODO:適切なタイミングで解凍ファイルの削除やダウンロードの処理をハッシュ値からダウンロード可否を判定する
+            //TODO:適切なタイミングで解凍ファイルの削除やダウンロードの処理を
             var exePath = Path.Combine(Settings.Default.UpdateFilePath, "net10.0-windows");
-            var updateExePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var updateExePath = Application.ExecutablePath;
             var robocopyOptions = new string[]
             {
                 "/XO",
@@ -423,7 +425,7 @@ public partial class MainForm : Form
             Process.Start(new ProcessStartInfo
             {
                 FileName = "powershell.exe",
-                Arguments = @$"-NoProfile -Command ""Wait-Process -Id {pid} -ErrorAction SilentlyContinue; robocopy '{exePath}' '{updateExePath}' {opt};",
+                Arguments = @$"-NoProfile -Command ""Wait-Process -Id {pid} -ErrorAction SilentlyContinue;robocopy '{exePath}' '{Path.GetDirectoryName(updateExePath)}' {opt};Start-Process '{updateExePath}';pause;",
                 UseShellExecute = true,
                 CreateNoWindow = true
             });
