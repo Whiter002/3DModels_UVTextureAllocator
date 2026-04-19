@@ -51,7 +51,7 @@ internal static class UpdateChecker
             string latestVersionStr = doc.RootElement.GetProperty("tag_name").GetString() ?? "";
             NuGetVersion.TryParse(latestVersionStr, out var latestVersion);
             // FIXME: TryParse が失敗すると currentVersion / latestVersion が null になり、比較結果が常に false になる。パース失敗時のハンドリングを追加すること。
-            if (latestVersion > currentVersion) updateAvailable = true;
+            if (latestVersion != currentVersion) updateAvailable = true;
         }
 
         if (!doc.RootElement.TryGetProperty("body", out var releaseNoteElement)) return result;
