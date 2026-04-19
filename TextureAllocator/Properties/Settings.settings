@@ -8,5 +8,8 @@
     <Setting Name="TempPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">%ALLUSERSPROFILE%\$(AssemblyName)\Temp</Value>
     </Setting>
+    <Setting Name="UpdateFilePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">%ALLUSERSPROFILE%\$(AssemblyName)\Temp\updates</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

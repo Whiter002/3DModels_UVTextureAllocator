@@ -33,16 +33,28 @@ public partial class MainForm : Form
     {
         InitializeComponent();
 
-        var path = Environment.ExpandEnvironmentVariables(Settings.Default.TempPath).Replace("$(AssemblyName)", Assembly.GetExecutingAssembly().GetName().Name);
+        var path = ExtractTempPathes(Settings.Default.TempPath);
         if (!Path.Exists(path)) Directory.CreateDirectory(path);
         Settings.Default.TempPath = path;
+
+        path = ExtractTempPathes(Settings.Default.UpdateFilePath);
+        if(!Path.Exists(path)) Directory.CreateDirectory(path);
+        Settings.Default.UpdateFilePath = path;
+
         Settings.Default.Save();
     }
     public MainForm(bool checkUpdate) : this()
     {
 
         if (checkUpdate) CheckUpdate(true);
+
     }
+
+    public string ExtractTempPathes(string path)
+    {
+        return Environment.ExpandEnvironmentVariables(path).Replace("$(AssemblyName)", Assembly.GetExecutingAssembly().GetName().Name);
+    }
+
     EyeRectangleData Profile;
     MainOperatePhase? _currentPhase = null;
     MainOperatePhase CurrentPhase
@@ -374,7 +386,7 @@ public partial class MainForm : Form
             UpdateNotification notifForm = new UpdateNotification();
             DialogResult dr = notifForm.ShowDialog(result.ReleaseNotesMarkDown);
             if(dr != DialogResult.OK) return;
-            var save = Path.Combine(Settings.Default.TempPath, $"{Guid.NewGuid()}.zip");
+            var save = Path.Combine(Settings.Default.UpdateFilePath,$"{result.TargetVersion}.zip");
             if (!Path.Exists(Path.GetDirectoryName(save)))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(save));
@@ -385,10 +397,13 @@ public partial class MainForm : Form
                 fileNameCaption = "release.zip",
                 saveTo = save
             };
-            DownLoadProgressForm progressForm = new DownLoadProgressForm([downloadInfo]);
-            DialogResult progressResult = progressForm.ShowDialog();
-            if(progressResult != DialogResult.OK) return;
-            ZipFile.ExtractToDirectory(save, Settings.Default.TempPath);
+            if (!File.Exists(save))
+            {
+                DownLoadProgressForm progressForm = new DownLoadProgressForm([downloadInfo]);
+                DialogResult progressResult = progressForm.ShowDialog();
+                if (progressResult != DialogResult.OK) return;
+            }
+            ZipFile.ExtractToDirectory(save, Settings.Default.UpdateFilePath);
             var pid = Process.GetCurrentProcess().Id;
             var exePath = Path.Combine(Settings.Default.TempPath, "release","net10.0-windows","Update.exe");
             Process.Start(new ProcessStartInfo
