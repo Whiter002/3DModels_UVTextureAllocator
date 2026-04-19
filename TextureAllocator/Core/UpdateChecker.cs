@@ -6,6 +6,14 @@ namespace TextureAllocator.Core;
 
 internal static class UpdateChecker
 {
+    static HttpClient httpClient = new()
+    {
+        Timeout = TimeSpan.FromSeconds(5),
+        DefaultRequestHeaders =
+        {
+            { "User-Agent", "Chrome" }
+        }
+    };
     internal static async Task<UpdateCheckResult> AutoCheckForUpdate()
     {
         var currentTime = DateTime.Now;
@@ -17,27 +25,19 @@ internal static class UpdateChecker
         }
         return result;
     }
-
-
     internal static async Task<UpdateCheckResult> CheckForUpdates()
     {
 
         // GitHub API で最新リリース情報を取得
         string apiUrl = "https://api.github.com/repos/Whiter002/3DModels_UVTextureAllocator/releases/latest";
 
-        using HttpClient client = new();
-        client.Timeout = TimeSpan.FromSeconds(5);
-        client.DefaultRequestHeaders.Add("User-Agent", "Chrome");
-
         UpdateCheckResult result = new(false, "","");
 
         // リリース情報のJSONを取得
         string releaseJson = "";
-        var responseMessge = await client.GetAsync(apiUrl).ConfigureAwait(false);
-        if (responseMessge.IsSuccessStatusCode)
-        {
-            releaseJson = await responseMessge.Content.ReadAsStringAsync().ConfigureAwait(false);
-        }
+        var responseMessage = await httpClient.GetAsync(apiUrl).ConfigureAwait(false);
+        if (!responseMessage.IsSuccessStatusCode) return result;
+        releaseJson = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         var utf8Reader = new Utf8JsonReader(System.Text.Encoding.UTF8.GetBytes(releaseJson));
 
         // assets 配列から LatestVersion.json のダウンロードURLを探す
@@ -59,8 +59,8 @@ internal static class UpdateChecker
             if (!doc.RootElement.TryGetProperty("assets", out var assets)) return result;
             foreach (var asset in assets.EnumerateArray())
             {
+                if (!asset.TryGetProperty("name", out var fileElement) || !String.Equals(fileElement.GetString(), "release.zip")) continue;
                 zipDownloadUrl = asset.GetProperty("browser_download_url").GetString()!;
-                if (updateAvailable is null) continue;
                 break;
             }
         }
