@@ -399,6 +399,10 @@ public partial class MainForm : Form
             };
             if (!File.Exists(save))
             {
+                foreach(string path in Directory.GetFiles(Path.GetDirectoryName(save)))
+                {
+                    File.Delete(path);
+                }
                 DownLoadProgressForm progressForm = new DownLoadProgressForm([downloadInfo]);
                 DialogResult progressResult = progressForm.ShowDialog();
                 if (progressResult != DialogResult.OK) return;
