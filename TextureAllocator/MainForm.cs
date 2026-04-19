@@ -341,7 +341,10 @@ public partial class MainForm : Form
         if (result.IsAvailable && !String.IsNullOrEmpty(result.DownloadUrl))
         {
             UpdateNotification notifForm = new UpdateNotification();
-            notifForm.ShowDialog(result.ReleaseNotesMarkDown);
+            DialogResult dr = notifForm.ShowDialog(result.ReleaseNotesMarkDown);
+            if(dr != DialogResult.OK) return;
+            //TODOここに更新処理
+            Application.Exit();
         }else if(!is_auto) MessageBox.Show("現在、利用可能なアップデートはありません。", "お知らせ", MessageBoxButtons.OK);
     }
 }
