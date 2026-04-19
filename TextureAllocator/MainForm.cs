@@ -409,8 +409,9 @@ public partial class MainForm : Form
                 DialogResult progressResult = progressForm.ShowDialog();
                 if (progressResult != DialogResult.OK) return;
             }
-
-            ZipFile.ExtractToDirectory(save, Settings.Default.UpdateFilePath,true);
+            var extractPath = Path.Combine(Settings.Default.UpdateFilePath, result.TargetVersion);
+            if(!Directory.Exists(extractPath)) Directory.CreateDirectory(extractPath);
+            ZipFile.ExtractToDirectory(save, extractPath, true);
             var pid = Process.GetCurrentProcess().Id;
             //TODO:適切なタイミングで解凍ファイルの削除やダウンロードの処理を
             var exePath = Path.Combine(Settings.Default.UpdateFilePath, "net10.0-windows");
