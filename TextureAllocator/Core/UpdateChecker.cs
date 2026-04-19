@@ -31,8 +31,8 @@ internal static class UpdateChecker
 
         // GitHub API で最新リリース情報を取得
         string apiUrl = "https://api.github.com/repos/Whiter002/3DModels_UVTextureAllocator/releases/latest";
-        
-        var result = new UpdateCheckResult(false, "","","");
+
+        var result = new UpdateCheckResult(false, "", "", "");
 
         // リリース情報のJSONを取得
         string releaseJson = "";
@@ -44,11 +44,12 @@ internal static class UpdateChecker
 
         if (!JsonDocument.TryParseValue(ref utf8Reader, out var doc)) return result;
 
-        string latestVersionStr = doc.RootElement.GetProperty("tag_name").GetString() ?? "";
-        bool? updateAvailable = null ;
+        if (!doc.RootElement.TryGetProperty("tag_name", out var latestVersionElement)) return result;
+        var latestVersionStr = latestVersionElement.GetString();
+
+        bool? updateAvailable = null;
         {//Compare Versions
             NuGetVersion.TryParse(VersionInfo.CurrentVersion, out var currentVersion);
-            // FIXME: tag_name が存在しない場合 GetProperty は KeyNotFoundException をスローする。TryGetProperty を使うこと。
             NuGetVersion.TryParse(latestVersionStr, out var latestVersion);
             // FIXME: TryParse が失敗すると currentVersion / latestVersion が null になり、比較結果が常に false になる。パース失敗時のハンドリングを追加すること。
             if (latestVersion != currentVersion) updateAvailable = true;
@@ -56,7 +57,7 @@ internal static class UpdateChecker
 
         if (!doc.RootElement.TryGetProperty("body", out var releaseNoteElement)) return result;
         var releaseNotes = releaseNoteElement.GetString();
-        
+        doc.Dispose();
         string zipDownloadUrl = null;
         if (updateAvailable ?? false) {
             if (!doc.RootElement.TryGetProperty("assets", out var assets)) return result;
@@ -68,7 +69,6 @@ internal static class UpdateChecker
             }
         }
 
-        // FIXME: JsonDocument (doc) が Dispose されていない。using を追加すること。
         Settings.Default.LastUpdateCheckDate = DateTime.Now;
         Settings.Default.Save();
         result = new(updateAvailable?? false, zipDownloadUrl ?? "",releaseNotes ?? "", latestVersionStr ?? "unVersioned");
