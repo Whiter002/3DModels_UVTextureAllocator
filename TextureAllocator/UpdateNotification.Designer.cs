@@ -110,6 +110,7 @@ partial class UpdateNotification
         UpdateButton.TabIndex = 0;
         UpdateButton.Text = "更新する";
         UpdateButton.UseVisualStyleBackColor = true;
+        UpdateButton.Click += Button_Click;
         // 
         // UpdateNotification
         // 

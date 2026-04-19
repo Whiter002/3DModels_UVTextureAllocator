@@ -17,6 +17,7 @@ public partial class MainForm : Form
 {
     event TransitionedMainStatusDelegate TransitionedMainStatusEvent;
     ColorPalette palette = new ColorPalette(Color.LightBlue, Color.LightPink, Color.LightGreen);
+    // FIXME: フォーム破棄時に imageSources 内の各 Image および BackGroundImage が Dispose されない。Dispose(bool) をオーバーライドして破棄すること。
     Image[] imageSources;
     Image BackGroundImage;
     string output = "";
@@ -179,6 +180,7 @@ public partial class MainForm : Form
         // FIXME: default ケースがないため、想定外の Profile.Kind で MatchFailureException が発生する。
         Rectangle[][] targetRectangles = Profile.Kind switch
         {
+            // FIXME: Profile.Eye / Profile.EyeBackGround / Profile.EyePupils が null の場合 NullReferenceException になる。null チェックを追加すること。
             EyeTextureType.INALL => [[..Profile.Eye.Select(r =>
             PictureBoxFunction.ImageBaseRectangleToControlRectangle(
                 ValueConverter.AttachUVRectangleToSize(r, imageSize), imageRectangleOnBox))
@@ -211,6 +213,7 @@ public partial class MainForm : Form
 
     private void pictureBox1_DragOver(object sender, DragEventArgs e)
     {
+        // FIXME: e.Data が null の場合 NullReferenceException が発生する。
         if (e.Data.GetData(DataFormats.FileDrop) is not string[] pathes || pathes.Length != 1) goto DisableDragDropEffect;
         // FIXME: 矩形取得ロジックが複数箇所に重複している。GetRectangles() に統一すること。
         List<RectangleF> targetRectangleFs = Profile.Kind switch
@@ -360,6 +363,9 @@ public partial class MainForm : Form
             UpdateNotification notifForm = new UpdateNotification();
             DialogResult dr = notifForm.ShowDialog(result.ReleaseNotesMarkDown);
             if(dr != DialogResult.OK) return;
+
+
+
             //TODOここに更新処理
             Application.Exit();
         }else if(!is_auto) MessageBox.Show("現在、利用可能なアップデートはありません。", "お知らせ", MessageBoxButtons.OK);
