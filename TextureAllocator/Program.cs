@@ -12,7 +12,7 @@ internal static class Program
     {
         // To customize application configuration such as set high DPI settings or default font,
         // see https://aka.ms/applicationconfiguration.
-        bool checkUpdateFlag = args.Length < 1 || args[0].ToLower() == "false";
+        bool checkUpdateFlag = (args?.Length??0) > 0 && args[0].ToLower() == "true";
         ApplicationConfiguration.Initialize();
         Application.Run(new MainForm(checkUpdateFlag));
     }

@@ -25,6 +25,7 @@ internal static class UpdateChecker
         }
         return result;
     }
+    // FIXME: ネットワーク障害時に TaskCanceledException / HttpRequestException が未処理のまま伝播する。try-catch を追加するか呼び出し側でハンドリングすること。
     internal static async Task<UpdateCheckResult> CheckForUpdates()
     {
 
@@ -35,19 +36,21 @@ internal static class UpdateChecker
 
         // リリース情報のJSONを取得
         string releaseJson = "";
+        // FIXME: responseMessage が Dispose されていない。using を追加すること。
         var responseMessage = await httpClient.GetAsync(apiUrl).ConfigureAwait(false);
         if (!responseMessage.IsSuccessStatusCode) return result;
         releaseJson = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         var utf8Reader = new Utf8JsonReader(System.Text.Encoding.UTF8.GetBytes(releaseJson));
 
-        // assets 配列から LatestVersion.json のダウンロードURLを探す
         if (!JsonDocument.TryParseValue(ref utf8Reader, out var doc)) return result;
 
         bool? updateAvailable = null ;
         {//Compare Versions
             NuGetVersion.TryParse(VersionInfo.CurrentVersion, out var currentVersion);
+            // FIXME: tag_name が存在しない場合 GetProperty は KeyNotFoundException をスローする。TryGetProperty を使うこと。
             string latestVersionStr = doc.RootElement.GetProperty("tag_name").GetString() ?? "";
             NuGetVersion.TryParse(latestVersionStr, out var latestVersion);
+            // FIXME: TryParse が失敗すると currentVersion / latestVersion が null になり、比較結果が常に false になる。パース失敗時のハンドリングを追加すること。
             if (latestVersion > currentVersion) updateAvailable = true;
         }
 
@@ -65,6 +68,7 @@ internal static class UpdateChecker
             }
         }
 
+        // FIXME: JsonDocument (doc) が Dispose されていない。using を追加すること。
         Settings.Default.LastUpdateCheckDate = DateTime.Now;
         Settings.Default.Save();
         result = new(updateAvailable?? false, zipDownloadUrl ?? "",releaseNotes ?? "");

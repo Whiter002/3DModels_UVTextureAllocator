@@ -1,4 +1,3 @@
-
 using OpenCvSharp.ImgHash;
 using System.Drawing.Imaging;
 using System.Text.Json;
@@ -129,6 +128,7 @@ public partial class MainForm : Form
         this.CurrentPhase = MainOperatePhase.UVSelect;
 
     }
+    // FIXME: JsonSerializer.Deserialize が null や不正 JSON で例外をスローする可能性がある。try-catch を追加すること。
     private (bool isSuccess, EyeRectangleData result) LoadFromProfile(ToolStripMenuItem profileItem)
     {
         if (profileItem.Tag is not string path || !File.Exists(path))
@@ -142,8 +142,10 @@ public partial class MainForm : Form
     private void label1_DragDrop(object sender, DragEventArgs e)
     {
 
+        // FIXME: e.Data や GetData が null の場合 NullReferenceException が発生する。null チェックを追加すること。
         string path = ((string[])e.Data.GetData(DataFormats.FileDrop))[0];
         if (!File.Exists(path)) return;
+        // FIXME: 前の BackGroundImage を Dispose していないためリソースリークする。
         using (var img = Image.FromFile(path)) BackGroundImage = ImageFunction.NormalizedPixcelFormat(img);
         this.pictureBox1.Image = BackGroundImage;
         this.CurrentPhase = MainOperatePhase.EyeTextureSelect;
@@ -152,6 +154,7 @@ public partial class MainForm : Form
 
     private void label1_DragEnter(object sender, DragEventArgs e)
     {
+        // FIXME: e.Data が null の場合 NullReferenceException が発生する。null チェックを追加すること。
         if (e.Data.GetData(DataFormats.FileDrop) is string[] pathes && pathes.Length == 1)
         {
             e.Effect = DragDropEffects.Copy;
@@ -165,12 +168,15 @@ public partial class MainForm : Form
     private void pictureBox1_Paint(object sender, PaintEventArgs e)
     {
 
+        // FIXME: Pen / SolidBrush が Dispose されておらず GDI リソースリークの原因になる。using または finally で破棄すること。
         Pen[] pens = [.. palette.Entries.Select(c => new Pen(c, 3)).ToArray()];
         SolidBrush[] brushes = [.. palette.Entries.Select(c => new SolidBrush(Color.FromArgb(64, c)))];
 
+        // FIXME: Profile is null で早期 return した場合、上で生成した pens / brushes が Dispose されない。生成位置を null チェックの後に移動すること。
         if (Profile is null) return;
         Rectangle imageRectangleOnBox = PictureBoxFunction.GetPictureRectangleBasedOnControl(pictureBox1, pictureBox1.Image?.Size ?? Size.Empty);
         var imageSize = new Size(imageRectangleOnBox.Width, imageRectangleOnBox.Height);
+        // FIXME: default ケースがないため、想定外の Profile.Kind で MatchFailureException が発生する。
         Rectangle[][] targetRectangles = Profile.Kind switch
         {
             EyeTextureType.INALL => [[..Profile.Eye.Select(r =>
@@ -206,6 +212,7 @@ public partial class MainForm : Form
     private void pictureBox1_DragOver(object sender, DragEventArgs e)
     {
         if (e.Data.GetData(DataFormats.FileDrop) is not string[] pathes || pathes.Length != 1) goto DisableDragDropEffect;
+        // FIXME: 矩形取得ロジックが複数箇所に重複している。GetRectangles() に統一すること。
         List<RectangleF> targetRectangleFs = Profile.Kind switch
         {
             EyeTextureType.INALL => [.. Profile.Eye ?? []],
@@ -240,11 +247,15 @@ public partial class MainForm : Form
     private void pictureBox1_DragDrop(object sender, DragEventArgs e)
     {
 
+        // FIXME: e.Data や GetData が null の場合 NullReferenceException が発生する。null チェックを追加すること。
         string path = ((string[])e.Data.GetData(DataFormats.FileDrop))[0];
         if (String.IsNullOrEmpty(path) || !File.Exists(path)) return;
+        // FIXME: index が imageSources の範囲外になると IndexOutOfRangeException が発生する可能性がある。
         int index = (int)_allocateTargetTextureKind - (int)Profile.Kind;
+        // FIXME: ClipImage に渡す前の古い imageSources[index] を Dispose していないためリソースリークする。
         using (var img = Image.FromFile(path)) imageSources[index] = ImageFunction.NormalizedPixcelFormat(img);
         imageSources[index] = ClipImage(imageSources[index]);
+        // FIXME: 矩形取得ロジックが複数箇所に重複している。GetRectangles() に統一すること。
         RectangleF[][] targetRectangleFs = Profile.Kind switch
         {
             EyeTextureType.INALL => [Profile.Eye ?? []],
@@ -267,9 +278,11 @@ public partial class MainForm : Form
                 ImageProcessor.PasteImageOnRectangles(useMs, ref ms, rectangles);
             }
         }
+        // FIXME: 前の pictureBox1.Image を Dispose していないため画像リソースがリークする。
         this.pictureBox1.Image = Image.FromStream(ms);
 
     }
+    // FIXME: 引数の source（元画像）を Dispose していないためリソースリークする。
     private Image ClipImage(Image source)
     {
         var ms = new MemoryStream();
@@ -304,11 +317,13 @@ public partial class MainForm : Form
     }
     private void Save(string Output)
     {
+        // FIXME: Bitmap が Dispose されていないためリソースリークする。using を使うこと。
         Bitmap bitmap = new Bitmap(BackGroundImage.Width, BackGroundImage.Height, PixelFormat.Format32bppArgb);
         for (int i = 0; i < imageSources.Length; i++)
         {
             var img = imageSources[i];
             if (img is null) continue;
+            // FIXME: GetRectangles() をループ内で毎回呼んでいるが結果は不変。ループ外に移動すること。
             var Rectangles = GetRectangles().Select(item => item.Select(r => ValueConverter.AttachUVRectangleToSize(r, bitmap.Size)).ToArray()).ToArray();
             using (var g = Graphics.FromImage(bitmap))
             {
@@ -335,11 +350,13 @@ public partial class MainForm : Form
     {
         CheckUpdate(false);
     }
+    // FIXME: UIスレッドで .Result を呼んでおりデッドロックの可能性がある。async/await に変更し、try-catch で例外をハンドリングすること。
     private void CheckUpdate(bool is_auto)
     {
         var result = is_auto? UpdateChecker.AutoCheckForUpdate().Result : UpdateChecker.CheckForUpdates().Result;
         if (result.IsAvailable && !String.IsNullOrEmpty(result.DownloadUrl))
         {
+            // FIXME: UpdateNotification を Dispose していない。using を使うこと。
             UpdateNotification notifForm = new UpdateNotification();
             DialogResult dr = notifForm.ShowDialog(result.ReleaseNotesMarkDown);
             if(dr != DialogResult.OK) return;

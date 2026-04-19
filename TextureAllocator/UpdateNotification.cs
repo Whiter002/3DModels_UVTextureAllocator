@@ -1,12 +1,6 @@
 ﻿using Markdig;
 using Markdig.Renderers;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Security.Policy;
-using System.Text;
 using System.Windows.Forms;
 
 namespace TextureAllocator;
@@ -27,6 +21,7 @@ public partial class UpdateNotification : Form
 
         string plainText = writer.ToString();
         plainText = plainText.Replace("\n", Environment.NewLine);
+        // FIXME: plainText を自分自身に連結しているためテキストが指数的に増大する。末尾改行の追加だけが目的なら修正すること。
         for(int i = 0; i < 5; i++)
         {
             plainText += plainText.EndsWith(Environment.NewLine) ? plainText : plainText+Environment.NewLine;
