@@ -28,9 +28,9 @@ public partial class UpdateNotification : Form
     private void Button_Click(object sender, EventArgs e)
     {
         if (sender is not Button button) return;
+        // FIXME: button.Tag は object 型。DialogResult は値型なので is パターンで直接マッチしない場合がある。Tag の設定方法（Load イベント内）と合わせて動作確認すること。
         if (button.Tag is not DialogResult result) return;
         this.DialogResult = result;
-
     }
 
     private void UpdateNotification_Load(object sender, EventArgs e)
