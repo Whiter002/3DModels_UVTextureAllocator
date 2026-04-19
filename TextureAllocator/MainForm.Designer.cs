@@ -165,6 +165,7 @@ partial class MainForm
         checkUpdateToolStripMenuItem.Name = "checkUpdateToolStripMenuItem";
         checkUpdateToolStripMenuItem.Size = new Size(180, 22);
         checkUpdateToolStripMenuItem.Text = "CheckUpdate";
+        checkUpdateToolStripMenuItem.Click += checkUpdateToolStripMenuItem_Click;
         // 
         // MainForm
         // 

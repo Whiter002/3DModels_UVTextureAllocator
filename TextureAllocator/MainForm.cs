@@ -27,19 +27,10 @@ public partial class MainForm : Form
     {
         InitializeComponent();
     }
-    public MainForm(bool checkUpdate):this()
+    public MainForm(bool checkUpdate) : this()
     {
 
-        if (checkUpdate)
-        {//Run Update Check
-
-            var result = UpdateChecker.AutoCheckForUpdate().Result;
-            if (result.IsAvailable && !String.IsNullOrEmpty(result.DownloadUrl))
-            {
-                UpdateNotification notifForm = new UpdateNotification();
-                notifForm.ShowDialog(result.ReleaseNotesMarkDown);
-            }
-        }
+        if (checkUpdate) CheckUpdate(true);
     }
     EyeRectangleData Profile;
     MainOperatePhase? _currentPhase = null;
@@ -338,5 +329,19 @@ public partial class MainForm : Form
         output = saveFileDialog1.FileName;
 
         Save(output);
+    }
+
+    private void checkUpdateToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        CheckUpdate(false);
+    }
+    private void CheckUpdate(bool is_auto)
+    {
+        var result = is_auto? UpdateChecker.AutoCheckForUpdate().Result : UpdateChecker.CheckForUpdates().Result;
+        if (result.IsAvailable && !String.IsNullOrEmpty(result.DownloadUrl))
+        {
+            UpdateNotification notifForm = new UpdateNotification();
+            notifForm.ShowDialog(result.ReleaseNotesMarkDown);
+        }else if(!is_auto) MessageBox.Show("現在、利用可能なアップデートはありません。", "お知らせ", MessageBoxButtons.OK);
     }
 }
