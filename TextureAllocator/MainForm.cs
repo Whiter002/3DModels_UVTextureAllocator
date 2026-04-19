@@ -1,4 +1,5 @@
 using OpenCvSharp.Aruco;
+using OpenCvSharp.Dnn;
 using OpenCvSharp.ImgHash;
 using System.Diagnostics;
 using System.Drawing.Imaging;
@@ -409,15 +410,24 @@ public partial class MainForm : Form
             }
             ZipFile.ExtractToDirectory(save, Settings.Default.UpdateFilePath);
             var pid = Process.GetCurrentProcess().Id;
-            var exePath = Path.Combine(Settings.Default.TempPath, "release","net10.0-windows","Update.exe");
+            //TODO:適切なタイミングで解凍ファイルの削除やダウンロードの処理をハッシュ値からダウンロード可否を判定する
+            var exePath = Path.Combine(Settings.Default.UpdateFilePath, "net10.0-windows");
+            var updateExePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var robocopyOptions = new string[]
+            {
+                "/XO",
+                "/S",
+                "/E"
+            };
+            var opt = String.Join(" ", robocopyOptions);
             Process.Start(new ProcessStartInfo
             {
                 FileName = "powershell.exe",
-                Arguments = $"-NoProfile -Command \"Wait-Process -Id {pid} -ErrorAction SilentlyContinue; Start-Process '{exePath}' -ArgumentList 'true'\"",
+                Arguments = @$"-NoProfile -Command ""Wait-Process -Id {pid} -ErrorAction SilentlyContinue; robocopy '{exePath}' '{updateExePath}' {opt};",
                 UseShellExecute = true,
                 CreateNoWindow = true
             });
-            Application.Exit();
+            Process.GetProcessById(pid).Kill();
         }else if(!is_auto) MessageBox.Show("現在、利用可能なアップデートはありません。", "お知らせ", MessageBoxButtons.OK);
     }
 }
