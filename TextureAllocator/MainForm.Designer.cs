@@ -43,6 +43,7 @@ partial class MainForm
         versionsToolStripMenuItem = new ToolStripMenuItem();
         label1 = new Label();
         saveFileDialog1 = new SaveFileDialog();
+        checkUpdateToolStripMenuItem = new ToolStripMenuItem();
         ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
         menuStrip1.SuspendLayout();
         SuspendLayout();
@@ -81,7 +82,7 @@ partial class MainForm
         // 
         loadProfilesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { howlHeartToolStripMenuItem });
         loadProfilesToolStripMenuItem.Name = "loadProfilesToolStripMenuItem";
-        loadProfilesToolStripMenuItem.Size = new Size(180, 22);
+        loadProfilesToolStripMenuItem.Size = new Size(138, 22);
         loadProfilesToolStripMenuItem.Text = "LoadProfiles";
         // 
         // howlHeartToolStripMenuItem
@@ -95,31 +96,31 @@ partial class MainForm
         // toolStripSeparator1
         // 
         toolStripSeparator1.Name = "toolStripSeparator1";
-        toolStripSeparator1.Size = new Size(177, 6);
+        toolStripSeparator1.Size = new Size(135, 6);
         // 
         // saveToolStripMenuItem
         // 
         saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-        saveToolStripMenuItem.Size = new Size(180, 22);
+        saveToolStripMenuItem.Size = new Size(138, 22);
         saveToolStripMenuItem.Text = "Save";
         saveToolStripMenuItem.Click += saveToolStripMenuItem_Click;
         // 
         // saveAsToolStripMenuItem
         // 
         saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-        saveAsToolStripMenuItem.Size = new Size(180, 22);
+        saveAsToolStripMenuItem.Size = new Size(138, 22);
         saveAsToolStripMenuItem.Text = "SaveAs";
         saveAsToolStripMenuItem.Click += saveAsToolStripMenuItem_Click_1;
         // 
         // toolStripSeparator2
         // 
         toolStripSeparator2.Name = "toolStripSeparator2";
-        toolStripSeparator2.Size = new Size(177, 6);
+        toolStripSeparator2.Size = new Size(135, 6);
         // 
         // exitToolStripMenuItem
         // 
         exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-        exitToolStripMenuItem.Size = new Size(180, 22);
+        exitToolStripMenuItem.Size = new Size(138, 22);
         exitToolStripMenuItem.Text = "Exit";
         // 
         // helpToolStripMenuItem
@@ -132,14 +133,15 @@ partial class MainForm
         // howToUseToolStripMenuItem
         // 
         howToUseToolStripMenuItem.Name = "howToUseToolStripMenuItem";
-        howToUseToolStripMenuItem.Size = new Size(135, 22);
+        howToUseToolStripMenuItem.Size = new Size(180, 22);
         howToUseToolStripMenuItem.Text = "How to Use";
         // 
         // versionsToolStripMenuItem
         // 
+        versionsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { checkUpdateToolStripMenuItem });
         versionsToolStripMenuItem.Name = "versionsToolStripMenuItem";
-        versionsToolStripMenuItem.Size = new Size(135, 22);
-        versionsToolStripMenuItem.Text = "Infos";
+        versionsToolStripMenuItem.Size = new Size(180, 22);
+        versionsToolStripMenuItem.Text = "Others";
         // 
         // label1
         // 
@@ -158,7 +160,13 @@ partial class MainForm
         // 
         saveFileDialog1.Filter = "PNG画像|*.png";
         // 
-        // Form1
+        // checkUpdateToolStripMenuItem
+        // 
+        checkUpdateToolStripMenuItem.Name = "checkUpdateToolStripMenuItem";
+        checkUpdateToolStripMenuItem.Size = new Size(180, 22);
+        checkUpdateToolStripMenuItem.Text = "CheckUpdate";
+        // 
+        // MainForm
         // 
         AllowDrop = true;
         AutoScaleDimensions = new SizeF(7F, 15F);
@@ -168,7 +176,7 @@ partial class MainForm
         Controls.Add(pictureBox1);
         Controls.Add(menuStrip1);
         MainMenuStrip = menuStrip1;
-        Name = "Form1";
+        Name = "MainForm";
         Text = "プロジェクトファイルを選択してください";
         Load += Form1_Load;
         ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
@@ -195,4 +203,5 @@ partial class MainForm
     private ToolStripMenuItem versionsToolStripMenuItem;
     private Label label1;
     private SaveFileDialog saveFileDialog1;
+    private ToolStripMenuItem checkUpdateToolStripMenuItem;
 }
