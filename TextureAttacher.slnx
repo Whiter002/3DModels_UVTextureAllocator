@@ -13,6 +13,9 @@
   <Folder Name="/Library/WindoesForm/">
     <Project Path="TextureAttachLib/WindowsForm/TextureAttacher.Library.WindoesForm/TextureAttacher.Library.WindoesForm.csproj" />
   </Folder>
+  <Folder Name="/Updater/">
+    <Project Path="SoftwareUpdator/SoftwareUpdator.csproj" Id="f8c42571-f819-4eed-b514-d00306138f27" />
+  </Folder>
   <Project Path="TextureAllocator/TextureAllocator.csproj" Id="8a6288fa-c911-4afd-943b-0e3d8aced833" />
   <Project Path="TextureProjectCreator/TextureProjectCreator.csproj" />
 </Solution>
