@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SoftwareUpdator\SoftwareUpdator.csproj" />
     <ProjectReference Include="..\TextureAttachLib\Core\TextureAttacher.Library.Core.csproj" />
     <ProjectReference Include="..\TextureAttachLib\Image\ImageMagic\TextureAttacher.Library.Image.ImageMagic\TextureAttacher.Library.Image.ImageMagic.csproj" />
     <ProjectReference Include="..\TextureAttachLib\Image\OpenCV\TextureAttacher.Library.Image.OpenCV.csproj" />
