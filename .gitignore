@@ -413,6 +413,8 @@ FodyWeavers.xsd
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
+#launch setting json
+launchSettings.json
 
 # Local History for Visual Studio Code
 .history/
