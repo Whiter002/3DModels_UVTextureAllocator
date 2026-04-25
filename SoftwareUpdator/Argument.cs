@@ -11,6 +11,8 @@ internal class Argument
     public string UpdateZipSource { get; set; }
     [Option('d', "-destination", Required = true, HelpText = "The destination path where the update should be extracted.")]
     public string UpdateExtractDestination { get; set; }
+    [Option('t',"-target-source",Required=true,HelpText="The definition file for the update in source.")]
+    public string TargetSourceDefFile { get; set; }
     [Option('m', "-mirror", Required = false, HelpText = "Whether to mirror the directory structure when extracting.")]
     public bool? Mirror { get; set; }
     [Option('p',"-PowershellCommand",Required=false,HelpText="The PowershellCommand for run after Update")]
