@@ -64,11 +64,16 @@ jobs:
           "ASSEMBLY_INFORMATIONAL_VERSION=$($versionInfo.AssemblyInformationalVersion)" >> $env:GITHUB_ENV
           "assembly_informational_version=$($versionInfo.AssemblyInformationalVersion)" >> $env:GITHUB_OUTPUT
 
+      - name: Create ReleaseContentsFile
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path TextureAllocator/bin/Release/net10.0-windows/app-data | Out-Null
+          Get-ChildItem -Recurse -File | Resolve-Path -Relative | Out-File "TextureAllocator/bin/Release/net10.0-windows/app-data/appContents.svdata"
       - name: Archive Release Outputs
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path build | Out-Null
-          Compress-Archive -Path TextureAllocator\bin\Release\net10.0-windows\* -DestinationPath build/release.zip -Force
+          Compress-Archive -Path TextureAllocator/bin/Release/net10.0-windows/* -DestinationPath build/release.zip -Force
 
       - name: Upload Workflow Artifact
         uses: actions/upload-artifact@v4
